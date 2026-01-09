@@ -1,34 +1,47 @@
-from sqlalchemy.types import String, Float, Integer
+from sqlalchemy.types import Float
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Enum
-from app.db.base import Source
 from datetime import datetime, timezone
-from sqlalchemy.orm import validates
 import sqlalchemy as sa
 from app.db.base import Base
+from sqlalchemy.orm import relationship
 
 
 class Price(Base):
     __tablename__ = "prices"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True,
-                                    autoincrement=True)
-    token: Mapped[str] = mapped_column(String(15), nullable=False, index=True)
-    price: Mapped[float] = mapped_column(
-                                        Float,
-                                        sa.CheckConstraint("price > 0"),
-                                        nullable=False)
-    source: Mapped[Source] = mapped_column(Enum(Source, name="price_source"),
-                                           nullable=False)
-    spread: Mapped[float | None] = mapped_column(Float, nullable=True)
-    timestamp: Mapped[datetime] = mapped_column(
-        nullable=False, default=lambda: datetime.now(timezone.utc), index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    token_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("tokens.id", ondelete="CASCADE"),
+        index=True
+    )
 
-    @validates("price")
-    def validate_price(self, key, value):
-        if value <= 0:
-            raise ValueError("Price must be positive")
-        return value
+    price_dex: Mapped[float] = mapped_column(
+        Float,
+        sa.CheckConstraint("price_dex > 0"),
+        nullable=False
+    )
+    price_cex: Mapped[float] = mapped_column(
+        Float,
+        sa.CheckConstraint("price_cex > 0"),
+        nullable=False
+    )
+
+    spread: Mapped[float | None] = mapped_column(Float)
+    timestamp: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(timezone.utc),
+        index=True
+    )
+
+    token: Mapped["Token"] = relationship(
+        back_populates="prices",
+        lazy="selectin"
+    )
 
     def __repr__(self) -> str:
-        return f"<Price {self.token} {self.price} ({self.source})>"
+        token_symbol = self.token.symbol if self.token else self.token_id
+        return (
+            f"<Price token={token_symbol} "
+            f"dex={self.price_dex} "
+            f"cex={self.price_cex} "
+            f"spread={self.spread:.2f}%>"
+        )

@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field, PositiveFloat
-from app.db.base import Source
 from datetime import datetime
 
 
@@ -7,12 +6,12 @@ class PriceBase(BaseModel):
     token: str = Field(max_length=15, description="The symbol of the" +
                        " cryptocurrency token",
                        pattern=r'^[A-Z]{3,5}$')
+    price_dex: PositiveFloat
+    price_cex: PositiveFloat
 
 
 class PriceCreate(PriceBase):
-    price: PositiveFloat = Field(..., description="The price of" +
-                                 " the cryptocurrency")
-    source: Source = Field(..., description="The source of the price data")
+    pass
 
 
 class PriceResponse(PriceBase):
@@ -22,7 +21,6 @@ class PriceResponse(PriceBase):
                           " of the price")
     timestamp: datetime = Field(..., description="The timestamp" +
                                 " when the price was recorded")
-    source: Source = Field(..., description="The source of the price data")
 
     @classmethod
     def calc_spread(cls, dex_price: float, cex_price: float) -> float:
