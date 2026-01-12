@@ -3,7 +3,7 @@ from sqlalchemy.types import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import relationship
 from sqlalchemy import Enum
-from datetime import datetime, timezone
+from datetime import datetime
 from app.db.base import Base
 from app.db.base import UserRole
 
@@ -22,7 +22,11 @@ class User(Base):
                                            nullable=False,
                                            default=UserRole.user)
     created_at: Mapped[datetime] = mapped_column(
-        nullable=False, default=lambda: datetime.now(timezone.utc), index=True)
+        nullable=False, default=lambda: datetime.now(), index=True)
 
     subscriptions: Mapped[list["Subscription"]] = relationship(back_populates="user",
                                                                cascade="all, delete-orphan")
+    tokens: Mapped[list["Token"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )

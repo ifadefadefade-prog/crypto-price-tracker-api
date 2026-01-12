@@ -1,9 +1,7 @@
-from app.schemas.users import UserCreate, UserLogin
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from models.users import User
+from app.models.users import User
 
 
 async def create_user(user: User,

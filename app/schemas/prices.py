@@ -17,10 +17,16 @@ class PriceCreate(PriceBase):
 class PriceResponse(PriceBase):
     id: int = Field(..., description="The unique identifier" +
                     " of the price entry")
+    token: str
+    price_dex: float
+    price_cex: float
     spread: float = Field(..., description="The spread percentage" +
                           " of the price")
     timestamp: datetime = Field(..., description="The timestamp" +
                                 " when the price was recorded")
+
+    class Config:
+        from_attributes = True
 
     @classmethod
     def calc_spread(cls, dex_price: float, cex_price: float) -> float:

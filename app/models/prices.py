@@ -28,7 +28,7 @@ class Price(Base):
 
     spread: Mapped[float | None] = mapped_column(Float)
     timestamp: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(),
         index=True
     )
 

@@ -53,7 +53,8 @@ async def update_user_pass(user_data, user_id, db):
     if not verify_password(user_data.old_pass, user.password_hash):
         raise HTTPException(401, detail="Wrong password")
 
-    res = set_user_password(db, user, get_password_hash(user_data.new_pass))
+    res = await set_user_password(db, user,
+                                  get_password_hash(user_data.new_pass))
     if not res:
         raise HTTPException(401, detail="Wrong password")
     return UserResponse.model_validate(res)
