@@ -56,7 +56,7 @@ async def get_token(db: AsyncSession, value: str, current_user_id: int):
     return TokenResponse.model_validate(token)
 
 
-async def list_tokens(
+async def get_list_tokens(
     db: AsyncSession,
     user_id: int,
     symbols: Optional[List[str]] = None,
